@@ -1,5 +1,3 @@
-# frequency-links
+# networked checkboxes
 
-a multi-user audio work
-
-uses socket.io to allow multiple participants to control the parameters of the same oscillator in p5.js and p5.sound.js.
+a clone of 1 Million Checkboxes using Socket.io and Google Sheets as Database
