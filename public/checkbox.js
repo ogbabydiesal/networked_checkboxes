@@ -1,5 +1,5 @@
 let socket = io();
-const checkboxes = 100
+const checkboxes = 1000
 
 const checkboxForm = document.querySelector('#checkboxForm');
 
