@@ -11,12 +11,42 @@ require('dotenv').config();
 
 const API_KEY = process.env.API_KEY;
 const SHEET_ID = process.env.SHEET_ID;
+const OAUTH = process.env.OAUTH;
+
+app.post('/api/checkboxes', async (req, res) => {
+ let params = {
+           "range":"Sheet1!A3:A4",
+           "majorDimension": "ROWS",
+           "values": [
+           ["Hello","World"]
+          ],
+     }
+  let xhr = new XMLHttpRequest();
+  xhr.open('PUT', 'https://sheets.googleapis.com/v4/spreadsheets/{SPREADSHEET_ID}/values/Sheet1!A1:B1?valueInputOption=USER_ENTERED');
+  xhr.setRequestHeader('Authorization', 'Bearer ' + OAUTH);
+const response = await fetch(url, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${OAUTH}` // OAuth token required for write access
+  },
+  body:(JSON.stringify(params))
+});
+
+
+
+const data = await response.json();
+console.log("sent "+data);
+
+}
+);
 
 app.get('/api/checkboxes', async (req, res) => {
     
   try {
     // Fetch all data from row 2 to the last row dynamically
     const range = `Sheet1!A1:F5`;
+  
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
     //const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?ranges=Sheet1!A1:F5&fields=sheets/data/rowData/values/userEnteredValue&key=${API_KEY}`;
 
@@ -55,6 +85,12 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, '/index.html'));
 });
 
+
+app.post('/', function(req, res) {
+  res.sendFile(path.join(__dirname, '/index.html'));
+});
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const server = app.listen(port, () => {
@@ -69,8 +105,12 @@ io.on('connection', (socket) => {
   
   //receives the checkbox emitter from Client
   socket.on("checkedState", (arg) => {
-    console.log(arg); 
-    io.emit('broadcastState', arg);
+    console.log("arg "+arg.id);
+    //change the google doc here
+    
+    //write to google doc with arg.id
+
+    io.emit('fromServer', arg);
   });
 
  
@@ -82,4 +122,6 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => console.log('Client disconnected'));
 });
+
+
 
