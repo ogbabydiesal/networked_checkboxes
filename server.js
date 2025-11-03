@@ -3,6 +3,23 @@
 const socketIO = require('socket.io');
 const express = require('express');
 const path = require('path');
+const fs = require('node:fs');
+
+//populateDatabaseWithStartingArray(1000);
+
+ var obj;
+    fs.readFile('database.txt', 'utf8', function (err, data) {
+      if (err) 
+        throw err;
+      //obj = JSON.parse(data);
+      //console.log("current database read "+data);
+  });
+  
+
+  
+
+
+
 const app = module.exports.app = express();
 const port = process.env.PORT || 3000;
 
@@ -21,9 +38,6 @@ app.post('/api/checkboxes', async (req, res) => {
            ["Hello","World"]
           ],
      }
-  let xhr = new XMLHttpRequest();
-  xhr.open('PUT', 'https://sheets.googleapis.com/v4/spreadsheets/{SPREADSHEET_ID}/values/Sheet1!A1:B1?valueInputOption=USER_ENTERED');
-  xhr.setRequestHeader('Authorization', 'Bearer ' + OAUTH);
 const response = await fetch(url, {
   method: 'POST',
   headers: {
@@ -41,44 +55,28 @@ console.log("sent "+data);
 }
 );
 
+
+
+
+
 app.get('/api/checkboxes', async (req, res) => {
-    
+  console.log("reading the get (/api/checkboxes) in the server");
   try {
-    // Fetch all data from row 2 to the last row dynamically
-    const range = `Sheet1!A1:F5`;
-  
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-    //const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?ranges=Sheet1!A1:F5&fields=sheets/data/rowData/values/userEnteredValue&key=${API_KEY}`;
+    fs.readFile('database.txt', 'utf8', function (err, data) {
+    if (err) 
+      throw err;
+    let statesArr = JSON.parse(data);
+    res.json({ 'states': statesArr });
+    //console.log("sent data "+data);
+  });
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.error) {
-      console.error('Sheet API Error:', data.error);
-      return res.status(400).json({ error: data.error.message });
-    }
-
-    const rows = data.values || [];
-    const numRows = 5;  // Your desired row count
-    const numCols = 6;  // Your desired column count (A-F)
-
-    // Fill in empty cells
-    const filledRows = [];
-    for (let i = 0; i < numRows; i++) {
-      const row = rows[i] || [];
-      const filledRow = [];
-      for (let j = 0; j < numCols; j++) {
-        filledRow.push(row[j] || '');
-      }
-      filledRows.push(filledRow);
-    }
-    
-    res.json({ data: filledRows });
   } catch (error) {
     //console.error('Error fetching sheet:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 
 app.get('/', function(req, res) {
@@ -106,6 +104,7 @@ io.on('connection', (socket) => {
   //receives the checkbox emitter from Client
   socket.on("checkedState", (arg) => {
     console.log("arg "+arg.id);
+    updateCheckboxDatabase(arg.id, arg.checked);
     //change the google doc here
     
     //write to google doc with arg.id
@@ -124,4 +123,54 @@ io.on('connection', (socket) => {
 });
 
 
+function updateCheckboxDatabase(id, state) {
+  //read the file
+  let statesArr;
+  fs.readFile('database.txt', 'utf8', function (err, data) {
+    if (err) 
+      throw err;
+    
+    statesArr = JSON.parse(data);
+    statesArr['states'][id] = state;
+    //console.log("11111 states array updated at "+ statesArr['states']);
+    console.log("new state "+state);
 
+    //write the file
+    console.log("1");
+    const content = {'states': statesArr['states']};
+    console.log("2");
+    const jsonString = JSON.stringify(content, null, 2);
+    console.log("3");
+    fs.writeFile('database.txt', jsonString, err => {
+      console.log("4");
+      if (err) {
+        console.error(err);
+      } else {
+        // file written successfully
+        console.log("wrote data ");
+      }
+    });
+
+  });
+
+
+  //console.log("22222 states array updated at "+ statesArr['states']);
+  //write the file
+  //statesArr = JSON.parse(statesArr);
+ 
+}
+
+
+function populateDatabaseWithStartingArray(numCheckboxes){
+  const startingArray = new Array(numCheckboxes).fill(false);
+  const content = {'states':startingArray};
+  const jsonString = JSON.stringify(content, null, 2);
+  fs.writeFile('database.txt', jsonString, err => {
+    if (err) {
+      console.error(err);
+    } else {
+      // file written successfully
+    }
+  });
+
+}

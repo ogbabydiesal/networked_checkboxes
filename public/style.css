@@ -1,7 +1,7 @@
 body {
     margin:0;
-    padding:0;
-    margin-top:25px;
+    padding:25px;
+    margin-top:-5px;
     font-family: sans-serif;
     font-size: 13px;
     font-weight: 100;
@@ -11,6 +11,22 @@ body {
     margin:auto;
     width:80%;  
     text-align:center;  
+}
+h1 {
+  font-size: 35px;
+  font-family: 'Bitcount Grid Single', serif;
+  font-weight: 450;
+  margin-left:11px;
+
+}
+
+
+h2 {
+  margin-left:11px;
+  font-size: 20px;
+  font-family: 'Bitcount Grid Single', serif;
+  font-weight: 350;
+
 }
 
 /* #checkboxForm{
@@ -27,13 +43,13 @@ body {
 
 #checkboxForm{
   display: grid;
-  grid-template-columns:  auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto;
-  
+  grid-template-columns:  auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto auto;
+  width:800px;
 }
 
 
 #myCheckbox{
-  width:200px;
+  width:400px;
   height:20px;
 }
 
@@ -78,3 +94,16 @@ button {
   font-family: sans-serif;
 
 }
+
+/* input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  /* -ms-transform: scale(2); /* IE */
+  /* -moz-transform: scale(2); /* FF */
+  /* -webkit-transform: scale(2); /* Safari and Chrome */
+  /* -o-transform: scale(2); /* Opera */
+  /* transform: scale(2);
+  padding: 10px; */ */ */ */ */
+/* } 
+
+
